@@ -44,7 +44,15 @@ class HTTPClient:
         }
 
         response = await cls.instance.post(cls.token_endpoint, headers=headers, data=data)
-        return response.json().get('access_token')
+try:
+    result = response.json()
+except Exception:
+    result = {"error": "Invalid JSON", "text": await response.aread()}
+
+if "access_token" not in result:
+    print("❌ Token response error:")
+    print(result)
+return result.get("access_token")
 
     @classmethod
     async def call_endpoints(cls, access_token: str):
