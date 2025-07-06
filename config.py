@@ -1,18 +1,13 @@
-from os import environ as env
+import os
 
-"""
-Changing value to "" (empty) or 0 will force the program to acquire that variable's value from system environment.
-"""
+class Config:
+CLIENT\_ID = os.getenv("E5\_CLIENT\_ID")
+CLIENT\_SECRET = os.getenv("E5\_CLIENT\_SECRET")
+REFRESH\_TOKEN = os.getenv("E5\_REFRESH\_TOKEN")
+REDIRECT\_URI = "[http://localhost:53682/](http://localhost:53682/)"
+TIME\_DELAY = int(os.getenv("E5\_TIME\_DELAY", 3))
 
-REFRESH_TOKEN = "" or env.get("E5_REFRESH_TOKEN")
-CLIENT_ID = "" or env.get("E5_CLIENT_ID")
-CLIENT_SECRET = "" or env.get("E5_CLIENT_SECRET")
-WEB_APP_PASSWORD = "" or env.get("E5_WEB_APP_PASSWORD")
-WEB_APP_HOST = "0.0.0.0" or env.get("E5_WEB_APP_HOST")
-WEB_APP_PORT = int(env.get("PORT", 8080))
-TIME_DELAY = int(env.get("E5_TIME_DELAY", 3))
-
-# WEB SERVER LOGGING CONFIGURATION
+```
 LOGGER_CONFIG_JSON = {
     'version': 1,
     'formatters': {
@@ -30,7 +25,7 @@ LOGGER_CONFIG_JSON = {
         'stream_handler': {
             'class': 'logging.StreamHandler',
             'formatter': 'default'
-        }
+        },
     },
     'loggers': {
         'uvicorn': {
@@ -41,9 +36,10 @@ LOGGER_CONFIG_JSON = {
             'level': 'WARNING',
             'handlers': ['file_handler', 'stream_handler']
         },
-        'httpx': {
+        'https': {
             'level': 'INFO',
             'handlers': ['file_handler', 'stream_handler']
-        }
+        },
     }
 }
+```
