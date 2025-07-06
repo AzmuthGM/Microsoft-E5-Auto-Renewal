@@ -3,7 +3,7 @@ name: E5-Auto-Renewal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 1 * * *'  # chạy hàng ngày lúc 8h sáng VN (1h UTC)
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
@@ -25,8 +25,8 @@ jobs:
 
       - name: Run script
         env:
-          USER: ${{ secrets.USER }}
-          PASS: ${{ secrets.PASS }}
-          TENANT: ${{ secrets.TENANT }}
+          E5_CLIENT_ID: ${{ secrets.E5_CLIENT_ID }}
+          E5_CLIENT_SECRET: ${{ secrets.E5_CLIENT_SECRET }}
+          E5_REFRESH_TOKEN: ${{ secrets.E5_REFRESH_TOKEN }}
         run: |
           python main.py
