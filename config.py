@@ -7,7 +7,6 @@ class Config:
     REDIRECT_URI = "http://localhost:53682/"
     TIME_DELAY = int(os.getenv("E5_TIME_DELAY", 3))
 
-```
 LOGGER_CONFIG_JSON = {
     'version': 1,
     'formatters': {
@@ -42,4 +41,3 @@ LOGGER_CONFIG_JSON = {
         },
     }
 }
-```
