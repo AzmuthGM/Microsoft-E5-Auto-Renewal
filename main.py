@@ -1,87 +1,67 @@
-from httpx import AsyncClient as httpx_client
-from asyncio import sleep as async_sleep
-from random import shuffle
-from config import *
+import asyncio
+import httpx
+import logging
+import random
+from config import Config
+
+TIME_DELAY = Config.TIME_DELAY
 
 class HTTPClient:
-    instance = httpx_client()
     token_endpoint = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
     graph_endpoints = [
         'https://graph.microsoft.com/v1.0/me/drive/root',
-        'https://graph.microsoft.com/v1.0/me/drive',
-        'https://graph.microsoft.com/v1.0/drive/root',
-        'https://graph.microsoft.com/v1.0/users',
         'https://graph.microsoft.com/v1.0/me/messages',
-        'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messageRules',
-        'https://graph.microsoft.com/v1.0/me/drive/root/children',
-        'https://api.powerbi.com/v1.0/myorg/apps',
-        'https://graph.microsoft.com/v1.0/me/mailFolders',
-        'https://graph.microsoft.com/v1.0/me/outlook/masterCategories',
-        'https://graph.microsoft.com/v1.0/applications?$count=true',
-        'https://graph.microsoft.com/v1.0/me/?$select=displayName,skills',
-        'https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages/delta',
-        'https://graph.microsoft.com/beta/me/outlook/masterCategories',
-        'https://graph.microsoft.com/beta/me/messages?$select=internetMessageHeaders&$top=1',
-        'https://graph.microsoft.com/v1.0/sites/root/lists',
-        'https://graph.microsoft.com/v1.0/sites/root',
-        'https://graph.microsoft.com/v1.0/sites/root/drives'
+        'https://graph.microsoft.com/v1.0/me/events',
     ]
+    instance = httpx.AsyncClient()
 
     @classmethod
-    async def acquire_access_token(
-        cls,
-        refresh_token: str = None,
-        client_id: str = None,
-        client_secret: str = None
-    ):
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        data = {
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh_token or REFRESH_TOKEN,
-            'client_id': client_id or CLIENT_ID,
-            'client_secret': client_secret or CLIENT_SECRET,
-            'redirect_uri': 'http://localhost:53682/'
+    async def acquire_access_token(cls):
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
         }
-
+        data = {
+            'client_id': Config.CLIENT_ID,
+            'client_secret': Config.CLIENT_SECRET,
+            'grant_type': 'refresh_token',
+            'refresh_token': Config.REFRESH_TOKEN,
+            'redirect_uri': Config.REDIRECT_URI
+        }
         response = await cls.instance.post(cls.token_endpoint, headers=headers, data=data)
-try:
-    result = response.json()
-except Exception:
-    result = {"error": "Invalid JSON", "text": await response.aread()}
+        try:
+            result = response.json()
+        except Exception:
+            result = {"error": "Invalid JSON", "text": await response.aread()}
 
-if "access_token" not in result:
-    print("❌ Token response error:")
-    print(result)
-return result.get("access_token")
+        if "access_token" not in result:
+            print("\u274c Token response error:")
+            print(result)
+        return result.get("access_token")
 
-@classmethod
+    @classmethod
     async def call_endpoints(cls, access_token: str):
-        shuffle(cls.graph_endpoints)
+        random.shuffle(cls.graph_endpoints)
         headers = {
             'Authorization': access_token,
             'Content-Type': 'application/json'
         }
-
         for endpoint in cls.graph_endpoints:
-            await async_sleep(TIME_DELAY)
+            await asyncio.sleep(TIME_DELAY)
             try:
                 await cls.instance.get(endpoint, headers=headers)
-                print(f"✅ Accessed: {endpoint}")
+                print(f"\u2705 Accessed: {endpoint}")
             except Exception as e:
-                print(f"⚠️ Failed: {endpoint} - {e}")
+                print(f"\u26a0\ufe0f Failed: {endpoint} - {e}")
 
-# ---------- Entry Point for GitHub Actions ----------
 
-import asyncio
-
-async def run_task_once():
-    print("🚀 Starting activity simulation...")
+async def main():
+    print("\ud83d\ude80 Starting activity simulation...")
     token = await HTTPClient.acquire_access_token()
-    if not token:
-        print("❌ Failed to acquire access token. Check credentials.")
-        return
-    await HTTPClient.call_endpoints(token)
-    print("✅ Activity simulation completed!")
+    if token:
+        await HTTPClient.call_endpoints(token)
+    else:
+        print("\u274c Failed to acquire access token. Check credentials.")
 
-if __name__ == '__main__':
-    asyncio.run(run_task_once())
+
+if __name__ == "__main__":
+    asyncio.run(main())
