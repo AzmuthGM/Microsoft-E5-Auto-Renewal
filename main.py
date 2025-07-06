@@ -34,7 +34,7 @@ class HTTPClient:
             result = {"error": "Invalid JSON", "text": await response.aread()}
 
         if "access_token" not in result:
-            print("\u274c Token response error:")
+            print("[ERROR] Token response error:")
             print(result)
         return result.get("access_token")
 
@@ -49,18 +49,18 @@ class HTTPClient:
             await asyncio.sleep(TIME_DELAY)
             try:
                 await cls.instance.get(endpoint, headers=headers)
-                print(f"\u2705 Accessed: {endpoint}")
+                print(f"[OK] Accessed: {endpoint}")
             except Exception as e:
-                print(f"\u26a0\ufe0f Failed: {endpoint} - {e}")
+                print(f"[WARN] Failed: {endpoint} - {e}")
 
 
 async def main():
-    print("\ud83d\ude80 Starting activity simulation...")
+    print("[Start] Starting activity simulation...")
     token = await HTTPClient.acquire_access_token()
     if token:
         await HTTPClient.call_endpoints(token)
     else:
-        print("\u274c Failed to acquire access token. Check credentials.")
+        print("[FAIL] Failed to acquire access token. Check credentials.")
 
 
 if __name__ == "__main__":
