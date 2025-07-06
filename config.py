@@ -1,11 +1,11 @@
 import os
 
 class Config:
-CLIENT\_ID = os.getenv("E5\_CLIENT\_ID")
-CLIENT\_SECRET = os.getenv("E5\_CLIENT\_SECRET")
-REFRESH\_TOKEN = os.getenv("E5\_REFRESH\_TOKEN")
-REDIRECT\_URI = "[http://localhost:53682/](http://localhost:53682/)"
-TIME\_DELAY = int(os.getenv("E5\_TIME\_DELAY", 3))
+    CLIENT_ID = os.getenv("E5_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("E5_CLIENT_SECRET")
+    REFRESH_TOKEN = os.getenv("E5_REFRESH_TOKEN")
+    REDIRECT_URI = "http://localhost:53682/"
+    TIME_DELAY = int(os.getenv("E5_TIME_DELAY", 3))
 
 ```
 LOGGER_CONFIG_JSON = {
