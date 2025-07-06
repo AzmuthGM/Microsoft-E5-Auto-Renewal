@@ -54,7 +54,7 @@ if "access_token" not in result:
     print(result)
 return result.get("access_token")
 
-    @classmethod
+@classmethod
     async def call_endpoints(cls, access_token: str):
         shuffle(cls.graph_endpoints)
         headers = {
