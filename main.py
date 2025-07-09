@@ -31,9 +31,12 @@ class HTTPClient:
         }
         response = await cls.instance.post(cls.token_endpoint, headers=headers, data=data)
         try:
-            result = response.json()
+           result = await response.json()
         except Exception:
-            result = {"error": "Invalid JSON", "text": await response.aread()}
+            result = {
+                "error": "Invalid JSON",
+                "text": await response.aread()
+            }
 
         if "access_token" not in result:
             print("[ERROR] Token response error:")
