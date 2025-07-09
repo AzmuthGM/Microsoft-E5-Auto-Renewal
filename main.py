@@ -30,10 +30,15 @@ class HTTPClient:
             'redirect_uri': Config.REDIRECT_URI
         }
 
+        # Gửi request lấy token
         response = await cls.instance.post(cls.token_endpoint, headers=headers, data=data)
+
+        # Thử parse JSON kết quả
         try:
-            result = await response.json()
+            # httpx.Response.json() là sync, không await
+            result = response.json()
         except Exception:
+            # Nếu parse JSON lỗi, đọc raw bytes
             body_bytes = await response.aread()
             body_text = body_bytes.decode(errors="ignore")
             result = {
@@ -41,6 +46,7 @@ class HTTPClient:
                 "text": body_text
             }
 
+        # Kiểm tra kết quả
         if "access_token" not in result:
             print("[ERROR] Token response error:")
             print(f"[DEBUG] Status: {response.status_code}")
@@ -48,24 +54,25 @@ class HTTPClient:
             send_telegram(f"❌ Không lấy được token. Phản hồi từ server:\n{result}")
             return None
 
+        # Trả về access token
         return result.get("access_token")
 
     @classmethod
     async def call_endpoints(cls, access_token: str):
         random.shuffle(cls.graph_endpoints)
         headers = {
-            'Authorization': access_token,
+            'Authorization': f'Bearer {access_token}',
             'Content-Type': 'application/json'
         }
         for endpoint in cls.graph_endpoints:
             await asyncio.sleep(TIME_DELAY)
             try:
-                await cls.instance.get(endpoint, headers=headers)
-                print(f"[OK] Accessed: {endpoint}")
+                response = await cls.instance.get(endpoint, headers=headers)
+                print(f"[OK] Accessed: {endpoint} ({response.status_code})")
             except Exception as e:
                 print(f"[WARN] Failed: {endpoint} - {e}")
 
-        # ✅ Gửi thông báo Telegram sau khi hoàn tất vòng lặp
+        # Gửi thông báo Telegram sau khi hoàn tất vòng lặp
         now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
         send_telegram(f"✅ Gia hạn E5 thành công lúc {now}. Tài khoản vẫn đang hoạt động.")
 
