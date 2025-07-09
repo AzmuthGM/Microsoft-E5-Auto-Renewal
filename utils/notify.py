@@ -13,7 +13,6 @@ def send_telegram(message: str):
     payload = {
         "chat_id": chat_id,
         "text": message,
-        "parse_mode": "Markdown"
     }
 
     try:
