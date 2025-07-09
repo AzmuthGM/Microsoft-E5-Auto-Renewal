@@ -36,7 +36,7 @@ class HTTPClient:
         except Exception:
             result = {
                 "error": "Invalid JSON",
-                "text": await response.aread()
+                "text": raw_text.decode(errors="ignore")  # ← decode để dễ debug
             }
 
         if "access_token" not in result:
