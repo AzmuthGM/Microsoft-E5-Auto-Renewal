@@ -3,6 +3,8 @@ import httpx
 import logging
 import random
 from config import Config
+from utils.notify import send_telegram
+from datetime import datetime
 
 TIME_DELAY = Config.TIME_DELAY
 
@@ -36,7 +38,8 @@ class HTTPClient:
         if "access_token" not in result:
             print("[ERROR] Token response error:")
             print(result)
-        return result.get("access_token")
+             send_telegram("❌ Token không hợp lệ hoặc đã hết hạn. Không thể gia hạn tài khoản E5.")
+        return None
 
     @classmethod
     async def call_endpoints(cls, access_token: str):
@@ -52,7 +55,9 @@ class HTTPClient:
                 print(f"[OK] Accessed: {endpoint}")
             except Exception as e:
                 print(f"[WARN] Failed: {endpoint} - {e}")
-
+# ✅ Gửi thông báo Telegram sau khi hoàn tất vòng lặp
+ now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+ send_telegram(f"✅ Gia hạn E5 thành công lúc {now}. Tài khoản vẫn đang hoạt động.")
 
 async def main():
     print("[Start] Starting activity simulation...")
@@ -61,7 +66,7 @@ async def main():
         await HTTPClient.call_endpoints(token)
     else:
         print("[FAIL] Failed to acquire access token. Check credentials.")
-
+    send_telegram("❌ Không lấy được access token. Có thể sai REFRESH_TOKEN hoặc CLIENT_SECRET.")
 
 if __name__ == "__main__":
     asyncio.run(main())
