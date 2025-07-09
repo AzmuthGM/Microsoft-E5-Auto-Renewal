@@ -69,4 +69,5 @@ async def main():
     send_telegram("❌ Không lấy được access token. Có thể sai REFRESH_TOKEN hoặc CLIENT_SECRET.")
 
 if __name__ == "__main__":
+    send_telegram("📢 Đây là tin nhắn test từ script E5!")
     asyncio.run(main())
