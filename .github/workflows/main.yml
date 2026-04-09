@@ -3,20 +3,22 @@ name: E5-Auto-Renewal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'  # chạy hàng ngày lúc 8h sáng VN (1h UTC)
+    - cron: '0 1 * * *' # 08:00 sáng giờ Việt Nam (01:00 UTC)
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -30,6 +32,5 @@ jobs:
           E5_REFRESH_TOKEN: ${{ secrets.E5_REFRESH_TOKEN }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-
         run: |
           python main.py
